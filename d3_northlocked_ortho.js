@@ -72,17 +72,34 @@ d3.json("https://unpkg.com/world-atlas@1/world/110m.json").then(function (data) 
         .attr("fill", "lightgreen")
         .attr("d", path);
 
-d3.json("./tracks.geojson").then(function (data) {
-    svg
-        // .selectAll(null)
-        .append("path")
-        .datum(data)
-        .attr("d", path)
-        .attr('fill-opacity', 0)
-        .attr('stroke', 'black')
-        .attr("stroke-width", 1)
-})}
+    d3.json("./tracks.geojson").then(function (data) {
+        svg
+            // .selectAll(null)
+            .append("path")
+            .datum(data)
+            .attr("d", path)
+            .attr('fill-opacity', 0)
+            .attr('stroke', 'black')
+            .attr("stroke-width", 1)
+    })
+
+    d3.image('./bitmapRacer.png')
+        .then(function (image) {
+            console.log(image)
+            d3.select("#map")
+                .append("image")
+                .attr("xlink:href", image.href)
+                .attr("width", image.width)
+                .attr("height", image.height);
+            d3.select("image")
+                .attr("x", 100)
+                .attr("y", 100)
+                .attr("width", 200)
+                .attr("height", 200)
+        })
+}
 )
+
 
 
 // import tracks from './tracks.geojson' assert { type: 'json' };
