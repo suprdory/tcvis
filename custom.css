@@ -1,7 +1,7 @@
-/* :root {
+:root {
+    background-color: black;
     --accent: rgb(108, 172, 255);
-} */
+    color:coral;
+    font-family: 'Courier New', Courier, monospace;
+}
 
-/* #map {
-    background-color: white;
-} */

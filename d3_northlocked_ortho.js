@@ -4,7 +4,7 @@
 // https://observablehq.com/@jnschrag/draggable-globe-in-d3
 
 let width = d3.select("#map").node().getBoundingClientRect().width
-let height = 500
+let height = 800
 const sensitivity = 75
 
 let projection = d3.geoOrthographic()
@@ -81,22 +81,37 @@ d3.json("https://unpkg.com/world-atlas@1/world/110m.json").then(function (data) 
             .attr('fill-opacity', 0)
             .attr('stroke', 'black')
             .attr("stroke-width", 1)
+            .style("opacity", 0.5)
     })
 
-    d3.image('./bitmapRacer.png')
-        .then(function (image) {
-            console.log(image)
-            d3.select("#map")
-                .append("image")
-                .attr("xlink:href", image.href)
-                .attr("width", image.width)
-                .attr("height", image.height);
-            d3.select("image")
-                .attr("x", 100)
-                .attr("y", 100)
-                .attr("width", 200)
-                .attr("height", 200)
-        })
+    d3.json("https://tcvisapi.eu.pythonanywhere.com/get_tcs_lonlatr?lon=120&lat=20&r=0.5").then(function (data) {
+        svg
+            // .selectAll(null)
+            .append("path")
+            .datum(data)
+            .attr("d", path)
+            .attr('fill-opacity', 0)
+            .attr('stroke', 'red')
+            .attr("stroke-width", 2)
+    })
+
+
+
+    
+    // d3.image('./bitmapRacer.png')
+    //     .then(function (image) {
+    //         console.log(image)
+    //         d3.select("#map")
+    //             .append("image")
+    //             .attr("xlink:href", image.href)
+    //             .attr("width", image.width)
+    //             .attr("height", image.height);
+    //         d3.select("image")
+    //             .attr("x", 100)
+    //             .attr("y", 100)
+    //             .attr("width", 200)
+    //             .attr("height", 200)
+    //     })
 }
 )
 
