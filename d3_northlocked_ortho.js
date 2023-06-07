@@ -3,15 +3,18 @@
 // draggable north-locked globe
 // https://observablehq.com/@jnschrag/draggable-globe-in-d3
 
-let width = d3.select("#map").node().getBoundingClientRect().width
-let height = 800
-const sensitivity = 75
+let apiurl = "https://tcvisapi.eu.pythonanywhere.com/";
+
+
+let width = d3.select("#map").node().getBoundingClientRect().width;
+let height = 800;
+const sensitivity = 75;
 
 let projection = d3.geoOrthographic()
     .scale(450)
     .center([0, 0])
     .rotate([-120, -10])
-    .translate([width / 2, height / 2])
+    .translate([width / 2, height / 2]);
 
 
 const initialScale = projection.scale()
@@ -22,7 +25,7 @@ let svg = d3.select("#map")
     .attr("width", width)
     .attr("height", height)
 
-var g = svg.append("g");
+// var g = svg.append("g");
 
 let globe = svg.append("circle")
     .attr("fill", "lightblue")
@@ -41,6 +44,24 @@ svg.append("path")
     .attr('fill', 'none')
     .attr('stroke', '#cccccc')
     .attr('stroke-width', '0.5px');
+
+
+svg.on("mousedown", function () {
+    let clickcoords = projection.invert(d3.mouse(this))
+    let getstr = apiurl + "get_tcs_lonlatr?lon=" + clickcoords[0] + "&lat=" + clickcoords[1] + "&r=0.5"
+    // console.log(getstr)
+
+    svg.selectAll("d.path").remove()
+    d3.json(getstr).then(function (data) {
+        svg
+            .append("path")
+            .datum(data)
+            .attr("d", path)
+            .attr('fill-opacity', 0)
+            .attr('stroke', 'coral')
+            .attr("stroke-width", 2)
+    })
+})
 
 svg.call(d3.drag().on('drag', () => {
     const rotate = projection.rotate()
@@ -83,82 +104,29 @@ d3.json("https://unpkg.com/world-atlas@1/world/110m.json").then(function (data) 
             .attr("stroke-width", 1)
             .style("opacity", 0.5)
     })
-
-    d3.json("https://tcvisapi.eu.pythonanywhere.com/get_tcs_lonlatr?lon=120&lat=20&r=0.5").then(function (data) {
-        svg
-            // .selectAll(null)
-            .append("path")
-            .datum(data)
-            .attr("d", path)
-            .attr('fill-opacity', 0)
-            .attr('stroke', 'red')
-            .attr("stroke-width", 2)
-    })
-
-
-
-    
-    // d3.image('./bitmapRacer.png')
-    //     .then(function (image) {
-    //         console.log(image)
-    //         d3.select("#map")
-    //             .append("image")
-    //             .attr("xlink:href", image.href)
-    //             .attr("width", image.width)
-    //             .attr("height", image.height);
-    //         d3.select("image")
-    //             .attr("x", 100)
-    //             .attr("y", 100)
-    //             .attr("width", 200)
-    //             .attr("height", 200)
-    //     })
 }
 )
 
 
-
-// import tracks from './tracks.geojson' assert { type: 'json' };
-
-
-
-// d3.json("./tracks.geojson").then(function (data) {
-//     // console.log(data)
-//     // svg.selectAll("path")
-//     //     .data(data.coordinates)
-//     //     .enter()
-//     //     .append("line")
-//     //     // .attr('stroke', 'black')
-//     //     // .attr('stroke-width', '1.0px')
-//     //     .attr("d", "path");
-
-//     svg.append("path")
-//         .datum({ type: "MultiLineString"})
-//         .attr("d", path);
-// }).catch(function (error) { console.log(error); })
-
-
-
-// // Standard enter / update 
-// var pathArcs = arcGroup.selectAll(".arc")
-//     .data(tracks);
-
-// //enter
-// pathArcs.enter()
-//     .append("path").attr({
-//         'class': 'arc'
-//     }).style({
-//         fill: 'none',
-//     });
-
-// //update
-// pathArcs.attr({
-//     //d is the points attribute for this path, we'll draw
-//     //  an arc between the points using the arc function
-//     d: path
-// })
-//     .style({
-//         stroke: '#0000ff',
-//         'stroke-width': '2px'
+// d3.image('./bitmapRacer.png')
+//     .then(function (image) {
+//         console.log(image)
+//         d3.select("#map")
+//             .append("image")
+//             .attr("xlink:href", image.href)
+//             .attr("width", image.width)
+//             .attr("height", image.height);
+//         d3.select("image")
+//             .attr("x", 100)
+//             .attr("y", 100)
+//             .attr("width", 200)
+//             .attr("height", 200)
 //     })
-//     // Uncomment this line to remove the transition
-//     .call(lineTransition); 
+
+
+//    var point;
+//    if (mousePoint) point = svg.insert("path", ".foreground")
+//              .datum({type: "Point", coordinates: projection.invert(d3.mouse(this))})
+//              .attr("class", "point")
+//              .attr("d", path); // add back the point
+// })
