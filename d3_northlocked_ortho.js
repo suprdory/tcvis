@@ -47,48 +47,49 @@ svg.append("path")
 
 
 svg.on("click", function () {
-    let coords = projection.invert(d3.mouse(this))
-    let getstr = apiurl + "get_tcs_lonlatr?lon=" + coords[0] + "&lat=" + coords[1] + "&r=0.5"
-    // console.log(getstr)
-    tracks.selectAll("path").remove()
-    tracks.selectAll("circle").remove()
+    if (ready4click) {
+        ready4click=false;
+        let coords = projection.invert(d3.mouse(this))
+        let getstr = apiurl + "get_tcs_lonlatr?lon=" + coords[0] + "&lat=" + coords[1] + "&r=0.5"
+        // console.log(getstr)
+        tracks.selectAll("path").remove()
+        tracks.selectAll("circle").remove()
 
-    // var projcoords = projection(coords);
+        // var projcoords = projection(coords);
 
-    // tracks
-    //     .append('path')
-    //     // .datum(d3.path.arc(coords[0],coords[1],3,0,2*3.1415))
-    //     .attr("d", path)
-    //     .attr('r', 10)
-    //     .style('fill', 'red');
+        // tracks
+        //     .append('path')
+        //     // .datum(d3.path.arc(coords[0],coords[1],3,0,2*3.1415))
+        //     .attr("d", path)
+        //     .attr('r', 10)
+        //     .style('fill', 'red');
 
-    d3.json(getstr).then(function (data) {
-        // console.log(data)
-        tracks
-            .append("path")
-            .datum(data)
-            .attr("d", path)
-            .attr('fill-opacity', 0)
-            .attr('stroke', 'coral')
-            .attr("stroke-width", 2)
-            .style("opacity", 1.0)
+        d3.json(getstr).then(function (data) {
+            // console.log(data)
+            tracks
+                .append("path")
+                .datum(data)
+                .attr("d", path)
+                .attr('fill-opacity', 0)
+                .attr('stroke', 'coral')
+                .attr("stroke-width", 2)
+                .style("opacity", 1.0)
 
-        let circPath = circlePath(coords[0], coords[1], 0.5)
-        // console.log(circPath)
-        tracks
-            .append("path")
-            .datum(circPath)
-            .attr("d", path)
-            .attr("fill","none")
-            .attr('fill-opacity', 1.0)
-            .attr('stroke', 'yellow')
-            .attr("stroke-width", 2.0)
-            .style("opacity", 1.0)
+            let circPath = circlePath(coords[0], coords[1], 0.5)
+            // console.log(circPath)
+            tracks
+                .append("path")
+                .datum(circPath)
+                .attr("d", path)
+                .attr("fill", "none")
+                .attr('fill-opacity', 1.0)
+                .attr('stroke', 'yellow')
+                .attr("stroke-width", 2.0)
+                .style("opacity", 1.0)
+            ready4click=true;
 
-    })
-
-
-
+        })
+    }
 })
 
 svg.call(d3.drag().on('drag', () => {
@@ -112,11 +113,15 @@ svg.call(d3.drag().on('drag', () => {
             d3.event.transform.k = 0.3
         }
     }))
+// .call(d3.zoom().on("zoom",()=>{
+
+// }))
 
 
 var land = svg.append("g");
 var bgtracks = svg.append("g");
 var tracks = svg.append("g");
+var ready4click = true
 
 d3.json("https://unpkg.com/world-atlas@1/world/110m.json").then(function (data) {
     land.selectAll(null)
