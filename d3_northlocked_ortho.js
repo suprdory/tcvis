@@ -5,6 +5,8 @@
 
 let apiurl = "https://tcvisapi.eu.pythonanywhere.com/";
 
+//wake up server
+fetch(apiurl)
 
 let width = d3.select("#map").node().getBoundingClientRect().width;
 let height = 800;
@@ -25,8 +27,6 @@ let svg = d3.select("#map")
     .attr("width", width)
     .attr("height", height)
 
-// var g = svg.append("g");
-
 let globe = svg.append("circle")
     .attr("fill", "lightblue")
     .attr("stroke", "#000")
@@ -46,21 +46,49 @@ svg.append("path")
     .attr('stroke-width', '0.5px');
 
 
-svg.on("mousedown", function () {
-    let clickcoords = projection.invert(d3.mouse(this))
-    let getstr = apiurl + "get_tcs_lonlatr?lon=" + clickcoords[0] + "&lat=" + clickcoords[1] + "&r=0.5"
+svg.on("click", function () {
+    let coords = projection.invert(d3.mouse(this))
+    let getstr = apiurl + "get_tcs_lonlatr?lon=" + coords[0] + "&lat=" + coords[1] + "&r=0.5"
     // console.log(getstr)
+    tracks.selectAll("path").remove()
+    tracks.selectAll("circle").remove()
 
-    svg.selectAll("d.path").remove()
+    // var projcoords = projection(coords);
+
+    // tracks
+    //     .append('path')
+    //     // .datum(d3.path.arc(coords[0],coords[1],3,0,2*3.1415))
+    //     .attr("d", path)
+    //     .attr('r', 10)
+    //     .style('fill', 'red');
+
     d3.json(getstr).then(function (data) {
-        svg
+        // console.log(data)
+        tracks
             .append("path")
             .datum(data)
             .attr("d", path)
             .attr('fill-opacity', 0)
             .attr('stroke', 'coral')
             .attr("stroke-width", 2)
+            .style("opacity", 1.0)
+
+        let circPath = circlePath(coords[0], coords[1], 0.5)
+        // console.log(circPath)
+        tracks
+            .append("path")
+            .datum(circPath)
+            .attr("d", path)
+            .attr("fill","none")
+            .attr('fill-opacity', 1.0)
+            .attr('stroke', 'yellow')
+            .attr("stroke-width", 2.0)
+            .style("opacity", 1.0)
+
     })
+
+
+
 })
 
 svg.call(d3.drag().on('drag', () => {
@@ -85,8 +113,13 @@ svg.call(d3.drag().on('drag', () => {
         }
     }))
 
+
+var land = svg.append("g");
+var bgtracks = svg.append("g");
+var tracks = svg.append("g");
+
 d3.json("https://unpkg.com/world-atlas@1/world/110m.json").then(function (data) {
-    svg.selectAll(null)
+    land.selectAll(null)
         .data(topojson.feature(data, data.objects.land).features)
         .enter()
         .append("path")
@@ -94,7 +127,7 @@ d3.json("https://unpkg.com/world-atlas@1/world/110m.json").then(function (data) 
         .attr("d", path);
 
     d3.json("./tracks.geojson").then(function (data) {
-        svg
+        bgtracks
             // .selectAll(null)
             .append("path")
             .datum(data)
@@ -104,9 +137,23 @@ d3.json("https://unpkg.com/world-atlas@1/world/110m.json").then(function (data) 
             .attr("stroke-width", 1)
             .style("opacity", 0.5)
     })
+
 }
+
 )
 
+function circlePath(x0, y0, r) {
+    let n = 20;
+    let dth = 2 * 3.1415 / n
+    let coords = []
+    for (let i = 0; i <= n; i++) {
+        coords.push([
+            x0 + r * Math.cos(i * dth),
+            y0 + r * Math.sin(i * dth)]
+        )
+    }
+    return { "type": "LineString", "coordinates": coords }
+}
 
 // d3.image('./bitmapRacer.png')
 //     .then(function (image) {
