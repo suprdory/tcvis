@@ -9,13 +9,16 @@ let apiurl = "https://tcvisapi.eu.pythonanywhere.com/";
 fetch(apiurl)
 
 let width = d3.select("#map").node().getBoundingClientRect().width;
-let height = 450;
+let height = 300;
 const sensitivity = 75;
 
+
+var coords = [120, 10] // slection coords, map init coords
+
 let projection = d3.geoOrthographic()
-    .scale(450)
+    .scale(200)
     .center([0, 0])
-    .rotate([-120, -10])
+    .rotate([-coords[0], -coords[1]])
     .translate([width / 2, height / 2]);
 
 
@@ -47,46 +50,53 @@ svg.append("path")
 
 
 svg.on("click", function () {
-        coords = projection.invert(d3.mouse(this))
-        updateData();     
-    }
+    coords = projection.invert(d3.mouse(this))
+    updateData();
+}
 )
 
 
-function updateData(){
-    if (obsReady & simReady){
-   
-    let getobsstr = apiurl + "get_obs_lonlatr?lon=" + coords[0] + "&lat=" + coords[1] + "&r="+selRad
-    let getsimstr = apiurl + "get_sim_lonlatr?lon=" + coords[0] + "&lat=" + coords[1] + "&r="+selRad
+function updateData() {
+    if (obsReady & simReady) {
+        spinner.style.visibility = "visible"
 
-    obstracks.selectAll("path").remove()
-    simtracks.selectAll("path").remove()
-    targetcirc.selectAll('*').remove()
-    obsReady=false;
-    simReady=false;
-    eraseGraph();
-   
-    d3.json(getsimstr).then(function (data) {
-        data.forEach(d => {
-            let trackDat = JSON.parse(JSON.parse(d)['tracks']);
-            let rprvDat = JSON.parse(JSON.parse(d)['rprv']);
-            plotTracks(trackDat, 2, 'coral', simtracks,0.2)
-            plotgraph(rprvDat, 2.0, 'coral',simlines);
-        });
-        simReady = true;
-    })
-    d3.json(getobsstr).then(function (data) {
-        let trackDat = JSON.parse(data['tracks'])
-        let rprvDat = JSON.parse(data['rprv'])
+        let getobsstr = apiurl + "get_obs_lonlatr?lon=" + coords[0] + "&lat=" + coords[1] + "&r=" + selRad
+        let getsimstr = apiurl + "get_sim_lonlatr?lon=" + coords[0] + "&lat=" + coords[1] + "&r=" + selRad
 
-        plotTracks(trackDat, 2, 'yellow', obstracks)
-        plotgraph(rprvDat, 4.0, 'yellow',obslines)
-        plotCirc(coords, selRad)
+        obstracks.selectAll("path").remove()
+        simtracks.selectAll("path").remove()
+        targetcirc.selectAll('*').remove()
+        obsReady = false;
+        simReady = false;
+        eraseGraph();
 
-        obsReady = true;
+        d3.json(getsimstr).then(function (data) {
+            data.forEach(d => {
+                let trackDat = JSON.parse(JSON.parse(d)['tracks']);
+                let rprvDat = JSON.parse(JSON.parse(d)['rprv']);
+                plotTracks(trackDat, 2, 'coral', simtracks, 0.2)
+                plotgraph(rprvDat, 2.0, 'coral', simlines);
+            });
+            simReady = true;
+            if (obsReady) {
+                spinner.style.visibility = "hidden"
+            }
+        })
+        d3.json(getobsstr).then(function (data) {
+            let trackDat = JSON.parse(data['tracks'])
+            let rprvDat = JSON.parse(data['rprv'])
 
-    })
-}
+            plotTracks(trackDat, 2, 'yellow', obstracks)
+            plotgraph(rprvDat, 4.0, 'yellow', obslines)
+            plotCirc(coords, selRad)
+
+            obsReady = true;
+            if (simReady){
+                spinner.style.visibility = "hidden"
+            }
+
+        })
+    }
 }
 
 
@@ -102,7 +112,7 @@ function plotCirc(coords, r) {
         .style("opacity", 1.0)
 }
 
-function plotTracks(trackDat, lw, col, targel,opacity=1.0) {
+function plotTracks(trackDat, lw, col, targel, opacity = 1.0) {
     targel
         .append("path")
         .datum(trackDat)
@@ -148,7 +158,8 @@ svg.call(d3.zoom().on('zoom', () => {
 // })
 
 
-var coords
+var spinner = document.getElementById("spinner")
+spinner.style.visibility = "hidden"
 var land = svg.append("g");
 var bgtracks = svg.append("g");
 var simtracks = svg.append("g");
@@ -157,22 +168,20 @@ var targetcirc = svg.append("g");
 var obsReady = true;
 var simReady = true;
 
-var selRad=1.0 // selection radius in degs
+var selRad = 1.0 // selection radius in degs
+document.getElementById("sliderText").innerHTML = "Selection Radius: " + selRad.toFixed(1) + '°';
 
-
-
-document.getElementById("radslider").onchange = function() { 
-    selRad=this.value;
-    document.getElementById('textInput').value=selRad;
+document.getElementById("radslider").onchange = function () {
+    selRad = this.value;
     updateData();
     // console.log(this.value)
 };
 
 document.getElementById("radslider").oninput = function () {
-    selRad = this.value;
-    document.getElementById('textInput').value = selRad;
+    selRad = parseFloat(this.value);
+    document.getElementById("sliderText").innerHTML = "Selection Radius: " + selRad.toFixed(1) + '°';
     targetcirc.selectAll('*').remove()
-    plotCirc(coords,selRad)
+    plotCirc(coords, selRad)
     // updateData();
     // console.log(this.value)
 };
@@ -211,9 +220,10 @@ function circlePath(x0, y0, r) {
 var log = console.log
 // set up line graph
 // set the dimensions and margins of the graph
+// var gwidth = d3.select("#map").node().getBoundingClientRect().width;
 var gmargin = { top: 10, right: 30, bottom: 38, left: 60 }
-var gwidth = 600 - gmargin.left - gmargin.right
-var gheight = 300 - gmargin.top - gmargin.bottom
+var gwidth = d3.select("#graph").node().getBoundingClientRect().width - gmargin.left - gmargin.right
+var gheight = 250 - gmargin.top - gmargin.bottom
 
 // append the svg object to the body of the page
 var svgg = d3.select("#graph")

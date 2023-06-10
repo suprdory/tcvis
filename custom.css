@@ -6,6 +6,9 @@
 }
 
 .slider {
+  /* margin-left: auto !important;
+  margin-right: auto !important; */
+  margin-bottom: 15;
   appearance: none;
   -webkit-appearance: none;
   width: min(50%, 300px);
@@ -49,8 +52,37 @@
   color: coral;
   border: 2px solid var(--input-border);
   border-radius: 4px;
+  width: 50px;
 }
 
 .yellow {
   color: yellow;
+}
+
+.centre {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.loader {
+  position: relative;
+  margin-top: -45px;
+  margin-left: 5px;
+  border: 10px solid saddlebrown;
+  border-radius: 50%;
+  border-top: 10px solid coral;
+  width: 20px;
+  height: 20px;
+  animation: spinner 1s linear infinite;
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
