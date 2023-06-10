@@ -9,7 +9,7 @@ let apiurl = "https://tcvisapi.eu.pythonanywhere.com/";
 fetch(apiurl)
 
 let width = d3.select("#map").node().getBoundingClientRect().width;
-let height = 300;
+let height = 500;
 const sensitivity = 75;
 
 
@@ -262,7 +262,7 @@ function plotgraphAxes() {
         .call(d3.axisBottom(xScale).ticks(10, logFormat10alt));
     //y-axis
     var yScale = d3.scaleLinear()
-        .domain([18, 80])
+        .domain([18, 90])
         .range([gheight, 0]);
     svgg.append("g")
         .call(d3.axisLeft(yScale));
