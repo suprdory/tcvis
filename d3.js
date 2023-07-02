@@ -12,8 +12,8 @@ let width = d3.select("#map").node().getBoundingClientRect().width;
 let height = 500;
 const sensitivity = 75;
 
-
-var coords = [120, 10] // slection coords, map init coords
+var coords0 = [120, 10]
+var coords = [coords0[0], coords0[1]] // selection coords, map init coords
 
 let projection = d3.geoOrthographic()
     .scale(200)
@@ -91,7 +91,7 @@ function updateData() {
             plotCirc(coords, selRad)
 
             obsReady = true;
-            if (simReady){
+            if (simReady) {
                 spinner.style.visibility = "hidden"
             }
 
@@ -123,16 +123,16 @@ function plotTracks(trackDat, lw, col, targel, opacity = 1.0) {
         .style("opacity", opacity)
 }
 
-svg.call(d3.drag().on('drag', () => {
-    const rotate = projection.rotate()
-    const k = sensitivity / projection.scale()
-    projection.rotate([
-        rotate[0] + d3.event.dx * k,
-        rotate[1] - d3.event.dy * k
-    ])
-    path = d3.geoPath().projection(projection)
-    svg.selectAll("path").attr("d", path)
-}))
+// svg.call(d3.drag().on('drag', () => {
+//     const rotate = projection.rotate()
+//     const k = sensitivity / projection.scale()
+//     projection.rotate([
+//         rotate[0] + d3.event.dx * k,
+//         rotate[1] - d3.event.dy * k
+//     ])
+//     path = d3.geoPath().projection(projection)
+//     svg.selectAll("path").attr("d", path)
+// }))
 
 svg.call(d3.zoom().on('zoom', () => {
     if (d3.event.transform.k > 0.3) {
@@ -145,17 +145,37 @@ svg.call(d3.zoom().on('zoom', () => {
         d3.event.transform.k = 0.3
     }
 }))
-// .on('wheel.zoom',()=>{
-//     if (d3.event.transform.k > 0.3) {
-//         projection.scale(initialScale * d3.event.transform.k)
+
+// let zoom = d3.zoom()
+//     .on('zoom', handleZoom);
+
+// function handleZoom() {
+//     // log('e:',e)
+//     d3.select('svg g')
+//         // .attr('transform', d3.event.transform);
+//     // log(d3.event.transform)
+// // }
+//     projection.scale(initialScale * d3.event.transform.k)
 //         path = d3.geoPath().projection(projection)
 //         svg.selectAll("path").attr("d", path)
 //         globe.attr("r", projection.scale())
-//     }
-//     else {
-//         d3.event.transform.k = 0.3
-//     }
-// })
+
+//     log(d3.event.transform)
+//     // const rotate = projection.rotate()
+//     // const k = sensitivity / projection.scale()
+//     projection.rotate([
+//          d3.event.transform.x-coords0[0] ,
+//         - d3.event.transform.y-coords0[1],
+//     ])
+//     path = d3.geoPath().projection(projection)
+//     svg.selectAll("path").attr("d", path)
+// }
+// function initZoom() {
+//     svg
+//         .call(zoom);
+// }
+// initZoom()
+
 
 
 var spinner = document.getElementById("spinner")
@@ -187,7 +207,7 @@ document.getElementById("radslider").oninput = function () {
 };
 
 
-d3.json("https://unpkg.com/world-atlas@1/world/110m.json").then(function (data) {
+d3.json("https://unpkg.com/world-atlas@1/world/50m.json").then(function (data) {
     land.selectAll(null)
         .data(topojson.feature(data, data.objects.land).features)
         .enter()
@@ -218,6 +238,11 @@ function circlePath(x0, y0, r) {
 }
 
 var log = console.log
+
+
+
+
+
 // set up line graph
 // set the dimensions and margins of the graph
 // var gwidth = d3.select("#map").node().getBoundingClientRect().width;
@@ -292,17 +317,21 @@ function eraseGraph() {
 }
 let rvplot = plotgraphAxes();
 
+// let im
 // d3.image('./bitmapRacer.png')
 //     .then(function (image) {
 //         console.log(image)
-//         tracks
-//             .append("image")
-//             .attr("d", path)
+//         im=simtracks
+//             .append("svg:image")
+//             // .attr("d", path)
 //             .attr("xlink:href", image.href)
-//             .attr("width", image.width)
-//             .attr("height", image.height)
-//             .attr("x", 10)
-//             .attr("y", 10)
-//             .attr("width", 200)
-//             .attr("height", 200)
-//     })
+//             // .attr("width", image.width)
+//             // .attr("height", image.height)
+//             .attr('preserveAspectRatio', 'none')
+//             .attr("x", 0)
+//             .attr("y", 0)
+//             .attr("width", 20)
+//             .attr("height", 20)
+//         // log(im)
+//     }
+//     )
