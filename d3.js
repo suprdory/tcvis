@@ -130,7 +130,7 @@ svg.call(d3.drag().on('drag', () => {
     if (d3.event.active < 2) { //no dragging when multi touch to allow zoom
         const rotate = projection.rotate()
         const k = sensitivity / projection.scale()
-        // log(d3.event)
+        log(d3.event.active)
         projection.rotate([
             rotate[0] + d3.event.dx * k,
             rotate[1] - d3.event.dy * k
@@ -138,9 +138,7 @@ svg.call(d3.drag().on('drag', () => {
         path = d3.geoPath().projection(projection)
         svg.selectAll("path").attr("d", path)
     }
-}))
-
-svg.call(d3.zoom().on('zoom', () => {
+})).call(d3.zoom().on('zoom', () => {
     if (d3.event.transform.k > 0.3) {
         projection.scale(initialScale * d3.event.transform.k)
         path = d3.geoPath().projection(projection)
